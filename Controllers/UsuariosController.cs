@@ -15,6 +15,7 @@ namespace WIS___PI___v2.Controllers
 {
     public class UsuariosController : Controller
     {
+        Logs imprimir = new Logs();
         private readonly WIS___PI___v2Context _context;
 
         public UsuariosController(WIS___PI___v2Context context)
@@ -77,20 +78,24 @@ namespace WIS___PI___v2.Controllers
                         UserRepository = new FileUserRepository("NossosDados")
                     };
                     var cliente = new FirebaseAuthClient(config);
-                    await cliente.CreateUserWithEmailAndPasswordAsync(usuario.Email, usuario.Senha); ;
-
+                    await cliente.CreateUserWithEmailAndPasswordAsync(usuario.Email, usuario.Senha);
+                    imprimir.log(1, "criar usuario");//log
                     _context.Add(usuario);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index));      
+                    
                 }
                 catch (Exception ex)
                 {
                     if (ex.Message.Contains("The user with the provided email already exists (EMAIL_EXISTS)"))
                     {
                         Console.WriteLine("Já existe o e-mail cadastrado.");
+                        imprimir.log(1, "Usuario Existe");//log
                     }
                 }
+                
             }
+            
             ViewData["GeneroId"] = new SelectList(_context.Set<Genero>(), "GeneroId", "NomeGenero", usuario.GeneroId);
             return View(usuario);
         }
